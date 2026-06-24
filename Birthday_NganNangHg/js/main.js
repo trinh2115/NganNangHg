@@ -27,3 +27,35 @@ onload = () => {
     clearTimeout(c);
   }, 1000);
 };
+
+const audio = document.getElementById("bg-music");
+
+let isPlaying = false;
+
+function startMusic() {
+  if (isPlaying) return;
+
+  audio.volume = 0.5; // tùy chỉnh
+  audio.loop = true;
+
+  const playPromise = audio.play();
+
+  if (playPromise !== undefined) {
+    playPromise
+      .then(() => {
+        isPlaying = true;
+        console.log("Music started");
+      })
+      .catch((err) => {
+        console.log("Autoplay blocked:", err);
+      });
+  }
+
+  // chỉ chạy 1 lần rồi tự gỡ
+  document.removeEventListener("click", startMusic);
+  document.removeEventListener("touchstart", startMusic);
+}
+
+// bắt cả click và touch để cover mọi thiết bị
+document.addEventListener("click", startMusic);
+document.addEventListener("touchstart", startMusic);
