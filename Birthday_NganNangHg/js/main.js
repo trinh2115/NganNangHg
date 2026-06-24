@@ -1,8 +1,3 @@
-function playBgMusic() {
-  const audio = document.getElementById('bg-music');
-  if (!audio) return;
-  audio.play().catch(() => {});
-}
 
 onload = () => {
   const c = setTimeout(() => {
@@ -30,32 +25,31 @@ onload = () => {
 
 const audio = document.getElementById("bg-music");
 
-let isPlaying = false;
+audio.loop = true;
+audio.volume = 0.5;
+
+let unlocked = false;
 
 function startMusic() {
-  if (isPlaying) return;
+  if (unlocked) return;
 
-  audio.volume = 0.5; // tùy chỉnh
-  audio.loop = true;
+  unlocked = true;
 
   const playPromise = audio.play();
 
-  if (playPromise !== undefined) {
-    playPromise
-      .then(() => {
-        isPlaying = true;
-        console.log("Music started");
-      })
-      .catch((err) => {
-        console.log("Autoplay blocked:", err);
-      });
+  if (playPromise) {
+    playPromise.catch(err => {
+      console.log("Play blocked:", err);
+      unlocked = false;
+    });
   }
 
-  // chỉ chạy 1 lần rồi tự gỡ
+  // remove listener sau khi chạy
   document.removeEventListener("click", startMusic);
   document.removeEventListener("touchstart", startMusic);
 }
 
-// bắt cả click và touch để cover mọi thiết bị
-document.addEventListener("click", startMusic);
-document.addEventListener("touchstart", startMusic);
+// bắt mọi tương tác đầu tiên
+document.addEventListener("click", startMusic, { once: true });
+document.addEventListener("touchstart", startMusic, { once: true });
+document.addEventListener("pointerdown", startMusic, { once: true });
